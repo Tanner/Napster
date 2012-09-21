@@ -4,10 +4,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 
 #define RECEIVE_BUFFER_SIZE 32
 
 #define DEFAULT_SERVER_PORT 7
+
+#define PROMPT "(napster) "
+
+void split(char *input, char **split, char *delimiter, int count);
 
 int main(int argc, char *argv[]) {
 	char *server_ip;
@@ -33,6 +38,40 @@ int main(int argc, char *argv[]) {
 	} else {
 		server_port = DEFAULT_SERVER_PORT;
 	}
+
+	char *input = malloc(sizeof(char) * 100);
+	assert(input);
+
+	int max_args = 2;
+	char **args = malloc(sizeof(char *) * (max_args + 1));
+	assert(args);
+
+	while(1) {
+		char *console_status;
+
+		// Get input from the user
+		printf("%s", PROMPT);
+		console_status = fgets(input, 100, stdin);
+
+		if (console_status) {
+			split(input, args, " \n", max_args + 1);
+
+			char *command = args[0];
+
+			if (command) {
+				if (strcmp(command, "quit") == 0) {
+					break;
+				}
+			}
+		}
+	}
+
+	free(input);
+
+	for (int i = 0; i < sizeof(args) / sizeof(char *); i++) {
+		free(args[i]);
+	}
+	free(args);
 
 	// Create a socket using TCP
 	int sock;
@@ -82,4 +121,33 @@ int main(int argc, char *argv[]) {
 
 	close(sock);
 	exit(0);
+}
+
+/**
+ * Split a string into x variable.
+ *
+ * @param *input String to split up
+ * @param **split Where to store results of split
+ * @param *delimiter Delimiter to use
+ * @param count Number of splits to make
+ */
+void split(char *input, char **split, char *delimiter, int count) {
+    char *temp = strtok(input, delimiter);
+
+    for (int i = 0; i < count; i++) {
+        if (split[i] != NULL) {
+            free(split[i]);
+
+            split[i] = NULL;
+        }
+
+        if (temp != NULL) {
+            split[i] = malloc(strlen(temp) + 1);
+            assert(split[i]);
+
+            strcpy(split[i], temp);
+        }
+
+        temp = strtok(NULL, delimiter);
+    }
 }
