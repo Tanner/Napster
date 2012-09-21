@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
 		exit(2);
 	}
 
+	printf("Server started...\n");
+
 	while(1) {
 		// Set the size of the in-out parameter
 		client_address_size = sizeof(client_address);
