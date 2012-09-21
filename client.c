@@ -15,8 +15,8 @@
 void split(char *input, char **split, char *delimiter, int count);
 void echo(int sock, char *string);
 
-int connect_to_server(char *server_ip, unsigned int server_port);
-int disconnect(int sock);
+int server_connect(char *server_ip, unsigned int server_port);
+int server_disconnect(int sock);
 
 int main(int argc, char *argv[]) {
 	char *server_ip;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
 				if (strcmp(command, "quit") == 0) {
 					break;
 				} else if (strcmp(command, "send") == 0) {
-					int sock = connect_to_server(server_ip, server_port);
+					int sock = server_connect(server_ip, server_port);
 
 					if (sock != -1) {
 						echo(sock, args[1]);
@@ -116,7 +116,7 @@ void echo(int sock, char *string) {
  * @param  server_port Port Number
  * @return             Socket descriptor
  */
-int connect_to_server(char *server_ip, unsigned int server_port) {
+int server_connect(char *server_ip, unsigned int server_port) {
 	// Create a socket using TCP
 	int sock;
 	if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
@@ -148,7 +148,7 @@ int connect_to_server(char *server_ip, unsigned int server_port) {
  * @param  sock Socket
  * @return      Result of close
  */
-int disconnect(int sock) {
+int server_disconnect(int sock) {
 	return close(sock);
 }
 
