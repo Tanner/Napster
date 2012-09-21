@@ -10,15 +10,12 @@
 #define DEFAULT_SERVER_PORT 7
 
 int main(int argc, char *argv[]) {
-	int sock;							// Socket Descriptor
-	struct sockaddr_in server_address;
-	unsigned short server_port;
 	char *server_ip;
+	unsigned int server_port;
+
 	char *echoString;                /* String to send to echo server */
 	char echoBuffer[RECEIVE_BUFFER_SIZE];     /* Buffer for echo string */
 	unsigned int echoStringLen;      /* Length of string to echo */
-	int bytes_received, total_bytes_received;   /* Bytes read in single recv() 
-										and total bytes read */
 
 	if ((argc < 3) || (argc > 4)) {
 	   fprintf(stderr, "Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
@@ -38,12 +35,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	// Create a socket using TCP
+	int sock;
 	if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 		fprintf(stderr, "Could not create socket.");
 		exit(2);
 	}
 
-	/* Construct the server address structure */
+	// Construct the server address structure
+	struct sockaddr_in server_address;
 	memset(&server_address, 0, sizeof(server_address));
 	server_address.sin_family = AF_INET;
 	server_address.sin_addr.s_addr = inet_addr(server_ip);
@@ -55,6 +54,8 @@ int main(int argc, char *argv[]) {
 		exit(2);
 	}
 
+	printf("Connected to the server!\n");
+
 	// Send the string to the server
 	if (send(sock, echoString, echoStringLen, 0) != echoStringLen) {
 		fprintf(stderr, "Sent a different number of bytes than expected.");
@@ -64,7 +65,8 @@ int main(int argc, char *argv[]) {
 	// Receive data from the server
 	printf("Received: ");
 
-	total_bytes_received = 0;
+	int total_bytes_received = 0;
+	int bytes_received = 0;
 	while (total_bytes_received < echoStringLen) {
 		if ((bytes_received = recv(sock, echoBuffer, RECEIVE_BUFFER_SIZE - 1, 0)) <= 0) {
 			fprintf(stderr, "Received failed or connection closed prematurely.");
