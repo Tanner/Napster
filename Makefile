@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Werror -ansi -pedantic -O0 -g
+CFLAGS = -Wall -Werror -ansi -pedantic -std=c99 -O0 -g
 
 CLIENT_OBJ = TCPEchoClient.o
 CLIENT_TARGET = client
