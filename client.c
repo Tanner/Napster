@@ -13,28 +13,25 @@
 #define PROMPT "(napster) "
 
 void split(char *input, char **split, char *delimiter, int count);
+void echo(int sock, char *string);
+
+int connect_to_server(char *server_ip, unsigned int server_port);
+int disconnect(int sock);
 
 int main(int argc, char *argv[]) {
 	char *server_ip;
 	unsigned int server_port;
 
-	char *echoString;                /* String to send to echo server */
-	char echoBuffer[RECEIVE_BUFFER_SIZE];     /* Buffer for echo string */
-	unsigned int echoStringLen;      /* Length of string to echo */
-
-	if ((argc < 3) || (argc > 4)) {
-	   fprintf(stderr, "Usage: %s <Server IP> <Echo Word> [<Echo Port>]\n", argv[0]);
+	if ((argc < 3) || (argc > 3)) {
+	   fprintf(stderr, "Usage: %s <Server IP> [<Echo Port>]\n", argv[0]);
 	   exit(1);
 	}
 
-	server_ip = argv[1];	// First argument – Server IP (dotted quad)
-	echoString = argv[2];	// Second argument – String to echo
-
-	echoStringLen = strlen(echoString);
+	server_ip = argv[1]; // First argument – Server IP (dotted quad)
 
 	// Use a given port if one is provided, otherwise the default
-	if (argc == 4) {
-		server_port = atoi(argv[3]);
+	if (argc == 3) {
+		server_port = atoi(argv[2]);
 	} else {
 		server_port = DEFAULT_SERVER_PORT;
 	}
@@ -61,6 +58,13 @@ int main(int argc, char *argv[]) {
 			if (command) {
 				if (strcmp(command, "quit") == 0) {
 					break;
+				} else if (strcmp(command, "send") == 0) {
+					int sock = connect_to_server(server_ip, server_port);
+
+					if (sock != -1) {
+						echo(sock, args[1]);
+						close(sock);
+					}
 				}
 			}
 		}
@@ -73,11 +77,51 @@ int main(int argc, char *argv[]) {
 	}
 	free(args);
 
+	exit(0);
+}
+
+void echo(int sock, char *string) {
+	char buffer[RECEIVE_BUFFER_SIZE];
+	unsigned int string_length;
+
+	string_length = strlen(string);
+
+	// Send the string to the server
+	if (send(sock, string, string_length, 0) != string_length) {
+		fprintf(stderr, "Sent a different number of bytes than expected.\n");
+	}
+
+	// Receive data from the server
+	printf("Received: ");
+
+	int total_bytes_received = 0;
+	int bytes_received = 0;
+	while (total_bytes_received < string_length) {
+		if ((bytes_received = recv(sock, buffer, RECEIVE_BUFFER_SIZE - 1, 0)) <= 0) {
+			fprintf(stderr, "Received failed or connection closed prematurely.\n");
+		}
+
+		total_bytes_received += bytes_received;
+		buffer[bytes_received] = '\0';
+		printf("%s", buffer);
+	}
+
+	printf("\n");
+}
+
+/**
+ * Create a socket and connect to the server.
+ * 
+ * @param  server_ip   Server IP (dotted quad)
+ * @param  server_port Port Number
+ * @return             Socket descriptor
+ */
+int connect_to_server(char *server_ip, unsigned int server_port) {
 	// Create a socket using TCP
 	int sock;
 	if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-		fprintf(stderr, "Could not create socket.");
-		exit(2);
+		fprintf(stderr, "Could not create socket.\n");
+		return -1;
 	}
 
 	// Construct the server address structure
@@ -89,38 +133,23 @@ int main(int argc, char *argv[]) {
 
 	// Establish the connection to the server
 	if (connect(sock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0) {
-		fprintf(stderr, "Could not connect to server.");
-		exit(2);
+		fprintf(stderr, "Could not connect to server.\n");
+		return -1;
 	}
 
 	printf("Connected to the server!\n");
 
-	// Send the string to the server
-	if (send(sock, echoString, echoStringLen, 0) != echoStringLen) {
-		fprintf(stderr, "Sent a different number of bytes than expected.");
-		exit(2);
-	}
+	return sock;
+}
 
-	// Receive data from the server
-	printf("Received: ");
-
-	int total_bytes_received = 0;
-	int bytes_received = 0;
-	while (total_bytes_received < echoStringLen) {
-		if ((bytes_received = recv(sock, echoBuffer, RECEIVE_BUFFER_SIZE - 1, 0)) <= 0) {
-			fprintf(stderr, "Received failed or connection closed prematurely.");
-			exit(2);
-		}
-
-		total_bytes_received += bytes_received;
-		echoBuffer[bytes_received] = '\0';
-		printf("%s", echoBuffer);
-	}
-
-	printf("\n");
-
-	close(sock);
-	exit(0);
+/**
+ * Close the socket.
+ * 
+ * @param  sock Socket
+ * @return      Result of close
+ */
+int disconnect(int sock) {
+	return close(sock);
 }
 
 /**
