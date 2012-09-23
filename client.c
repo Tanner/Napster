@@ -12,7 +12,7 @@
 
 #define PROMPT "(napster) "
 
-void split(char *input, char **split, char *delimiter, int count);
+char ** split(char *input, char *delimiter);
 void echo(int sock, char *string);
 
 int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args);
@@ -41,9 +41,7 @@ int main(int argc, char *argv[]) {
 	char *input = malloc(sizeof(char) * 100);
 	assert(input);
 
-	int max_args = 2;
-	char **args = malloc(sizeof(char *) * (max_args + 1));
-	assert(args);
+	char **args = 0;
 
 	while(1) {
 		char *console_status;
@@ -53,7 +51,11 @@ int main(int argc, char *argv[]) {
 		console_status = fgets(input, 100, stdin);
 
 		if (console_status) {
-			split(input, args, " \n", max_args + 1);
+			if (args) {
+				free(args);
+			}
+
+			args = split(input, " \n");
 
 			char *command = args[0];
 
@@ -175,27 +177,51 @@ int server_disconnect(int sock) {
  * Split a string into x variable.
  *
  * @param *input		String to split up
- * @param **split		Where to store results of split
  * @param *delimiter	Delimiter to use
- * @param count			Number of splits to make
  */
-void split(char *input, char **split, char *delimiter, int count) {
-    char *temp = strtok(input, delimiter);
+char ** split(char *input, char *delimiter) {
+	char *input_copy = 0;
+	char *temp = 0;
 
-    for (int i = 0; i < count; i++) {
-        if (split[i] != NULL) {
-            free(split[i]);
+	// Count the number of chunks that exist in the string
 
-            split[i] = NULL;
-        }
+	input_copy = malloc(sizeof(char) * strlen(input));
+	assert(input_copy);
 
-        if (temp != NULL) {
-            split[i] = malloc(strlen(temp) + 1);
-            assert(split[i]);
+	strcpy(input_copy, input);
 
-            strcpy(split[i], temp);
-        }
+	int count = -1;
+	do {
+		if (temp == 0) {
+			temp = strtok(input_copy, delimiter);
+		} else {
+			temp = strtok(NULL, delimiter);
+		}
 
-        temp = strtok(NULL, delimiter);
-    }
+		count++;
+	} while (temp);
+
+	free(input_copy);
+
+	// Create an array of that size (to hold all the chunks)
+
+	char **split = malloc(sizeof(char *) * count);
+	assert(split);
+
+	// Begin to assign the chunks into the array
+
+	temp = strtok(input, delimiter);
+
+	for (int i = 0; i < count; i++) {
+		if (temp != NULL) {
+			split[i] = malloc(strlen(temp) + 1);
+			assert(split[i]);
+
+			strcpy(split[i], temp);
+		}
+
+		temp = strtok(NULL, delimiter);
+	}
+
+	return split;
 }
