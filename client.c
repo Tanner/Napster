@@ -15,6 +15,8 @@
 void split(char *input, char **split, char *delimiter, int count);
 void echo(int sock, char *string);
 
+int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args);
+
 int server_connect(char *server_ip, unsigned int server_port);
 int server_disconnect(int sock);
 
@@ -59,12 +61,7 @@ int main(int argc, char *argv[]) {
 				if (strcmp(command, "quit") == 0) {
 					break;
 				} else if (strcmp(command, "send") == 0) {
-					int sock = server_connect(server_ip, server_port);
-
-					if (sock != -1) {
-						echo(sock, args[1]);
-						close(sock);
-					}
+					server_command(server_ip, server_port, echo, args[1]);
 				}
 			}
 		}
@@ -107,6 +104,29 @@ void echo(int sock, char *string) {
 	}
 
 	printf("\n");
+}
+
+/**
+ * Connects to the server and runs a command using that socket.
+ *
+ * @param server_ip			Server IP (dotted quad)
+ * @param server_port		Port Number
+ * @param command_function	Function that takes in socket descriptor and char*
+ * @param args				Args to pass to command_function
+ * @return Result of socket creation
+ */
+
+int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args) {
+	int sock = server_connect(server_ip, server_port);
+
+	if (sock == -1) {
+		return -1;
+	} else {
+		command_function(sock, args);
+		close(sock);
+
+		return 0;
+	}
 }
 
 /**
