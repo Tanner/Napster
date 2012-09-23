@@ -115,7 +115,6 @@ void echo(int sock, char *string) {
  * @param args				Args to pass to command_function
  * @return Result of socket creation
  */
-
 int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args) {
 	int sock = server_connect(server_ip, server_port);
 
@@ -132,9 +131,9 @@ int server_command(char *server_ip, unsigned int server_port, void (*command_fun
 /**
  * Create a socket and connect to the server.
  * 
- * @param  server_ip   Server IP (dotted quad)
- * @param  server_port Port Number
- * @return             Socket descriptor
+ * @param server_ip		Server IP (dotted quad)
+ * @param server_port	Port Number
+ * @return Socket descriptor
  */
 int server_connect(char *server_ip, unsigned int server_port) {
 	// Create a socket using TCP
@@ -165,8 +164,8 @@ int server_connect(char *server_ip, unsigned int server_port) {
 /**
  * Close the socket.
  * 
- * @param  sock Socket
- * @return      Result of close
+ * @param sock Socket
+ * @return Result of close
  */
 int server_disconnect(int sock) {
 	return close(sock);
@@ -175,10 +174,10 @@ int server_disconnect(int sock) {
 /**
  * Split a string into x variable.
  *
- * @param *input String to split up
- * @param **split Where to store results of split
- * @param *delimiter Delimiter to use
- * @param count Number of splits to make
+ * @param *input		String to split up
+ * @param **split		Where to store results of split
+ * @param *delimiter	Delimiter to use
+ * @param count			Number of splits to make
  */
 void split(char *input, char **split, char *delimiter, int count) {
     char *temp = strtok(input, delimiter);
