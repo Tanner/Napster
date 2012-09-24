@@ -10,11 +10,7 @@
 
 #define MAX_PENDING 5
 
-#define RECEIVE_BUFFER_SIZE 32
-
 void handleClient(int client_socket);
-
-int validMessage(char *message);
 
 int main(int argc, char *argv[])
 {
@@ -74,58 +70,11 @@ int main(int argc, char *argv[])
 }
 
 void handleClient(int client_socket) {
-	char received_buffer[RECEIVE_BUFFER_SIZE];
-	int received_message_size = 0;
+	char *message = get_response(client_socket);
 
-	int total_message_size = 0;
-	int message_capacity = RECEIVE_BUFFER_SIZE;
+	printf("Done – %s – Size: %d\n", message, (int) strlen(message));
 
-	char *message = malloc(sizeof(char) * RECEIVE_BUFFER_SIZE);
-	assert(message);
-
-	// Send received string and receive again until end of transmission
-	do {
-		// Receive message from client
-		if ((received_message_size = recv(client_socket, received_buffer, RECEIVE_BUFFER_SIZE, 0)) < 0) {
-			fprintf(stderr, "Receive failed.");
-		}
-		printf("Size Received: %d\n", received_message_size);
-
-		for (int i = 0; i < received_message_size; i++) {
-			message[total_message_size + i] = received_buffer[i];
-		}
-
-		memset(received_buffer, 0, RECEIVE_BUFFER_SIZE);
-
-		total_message_size += received_message_size;
-
-		if (total_message_size > message_capacity) {
-			message_capacity += RECEIVE_BUFFER_SIZE;
-
-			message = realloc(message, message_capacity);
-		}
-	} while (validMessage(message) && received_message_size > 0);
-
-	printf("Done – %s – Size: %d\n", message, total_message_size);
+	free(message);
 
 	close(client_socket);
-}
-
-/**
- * Check to see if a string is a valid request message.
- * @param  message String
- * @return 1 or 0 for validity
- */
-int validMessage(char *message) {
-	int length = strlen(message);
-
-	// Valid message ends in \r\n\r\n
-	
-	if (length < 4) {
-		return 0;
-	}
-	return message[length] == '\n' &&
-			message[length - 1] == '\r' &&
-			message[length - 2] == '\n' &&
-			message[length - 3] == '\r';
 }
