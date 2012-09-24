@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <assert.h>
 
+#define SEND_MESSAGE_SIZE 512
 #define RECEIVE_BUFFER_SIZE 32
 
 #define DEFAULT_SERVER_PORT 7
@@ -13,6 +14,8 @@
 #define PROMPT "(napster) "
 
 char ** split(char *input, char *delimiter);
+
+void add_file(int sock, char *string);
 void echo(int sock, char *string);
 
 int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args);
@@ -62,8 +65,10 @@ int main(int argc, char *argv[]) {
 			if (command) {
 				if (strcmp(command, "quit") == 0) {
 					break;
-				} else if (strcmp(command, "send") == 0) {
+				} else if (strcmp(command, "echo") == 0) {
 					server_command(server_ip, server_port, echo, args[1]);
+				} else if (strcmp(command, "add") == 0) {
+					server_command(server_ip, server_port, add_file, args[1]);
 				}
 			}
 		}
@@ -79,14 +84,29 @@ int main(int argc, char *argv[]) {
 	exit(0);
 }
 
+void add_file(int sock, char *string) {
+	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
+
+	snprintf(message, SEND_MESSAGE_SIZE, "ADD: %s\r\n\r\n", string);
+
+	send(sock, message, strlen(message), 0);
+
+	printf("Sent %s", message);
+
+	// while (1) { }
+
+	printf("Done!");
+}
+
 void echo(int sock, char *string) {
 	char buffer[RECEIVE_BUFFER_SIZE];
-	unsigned int string_length;
 
-	string_length = strlen(string);
+	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
+
+	snprintf(message, SEND_MESSAGE_SIZE, "ECHO: %s\r\n\r\n", string);
 
 	// Send the string to the server
-	if (send(sock, string, string_length, 0) != string_length) {
+	if (send(sock, message, strlen(message), 0) != strlen(message)) {
 		fprintf(stderr, "Sent a different number of bytes than expected.\n");
 	}
 
@@ -95,7 +115,7 @@ void echo(int sock, char *string) {
 
 	int total_bytes_received = 0;
 	int bytes_received = 0;
-	while (total_bytes_received < string_length) {
+	while (total_bytes_received < strlen(message)) {
 		if ((bytes_received = recv(sock, buffer, RECEIVE_BUFFER_SIZE - 1, 0)) <= 0) {
 			fprintf(stderr, "Received failed or connection closed prematurely.\n");
 		}
@@ -170,6 +190,8 @@ int server_connect(char *server_ip, unsigned int server_port) {
  * @return Result of close
  */
 int server_disconnect(int sock) {
+	printf("Disconnecting from server!\n");
+
 	return close(sock);
 }
 
