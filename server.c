@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <assert.h>
 
 #define MAX_PENDING 5
 
@@ -69,26 +70,39 @@ int main(int argc, char *argv[])
 }
 
 void handleClient(int client_socket) {
-	char echoBuffer[RECEIVE_BUFFER_SIZE];
-	int recvMsgSize;
+	char received_buffer[RECEIVE_BUFFER_SIZE];
+	int received_message_size = 0;
 
-	// Receive message from client
-	if ((recvMsgSize = recv(client_socket, echoBuffer, RECEIVE_BUFFER_SIZE, 0)) < 0) {
-		fprintf(stderr, "Receive failed.");
-	}
+	int total_message_size = 0;
+	int message_capacity = RECEIVE_BUFFER_SIZE;
+
+	char *message = malloc(sizeof(char) * RECEIVE_BUFFER_SIZE);
+	assert(message);
 
 	// Send received string and receive again until end of transmission
-	while (recvMsgSize > 0) {
-		// Echo message back to client
-		if (send(client_socket, echoBuffer, recvMsgSize, 0) != recvMsgSize) {
-			fprintf(stderr, "Send failed.");
-		}
-
-		// See if there is more data to receive
-		if ((recvMsgSize = recv(client_socket, echoBuffer, RECEIVE_BUFFER_SIZE, 0)) < 0) {
+	do {
+		// Receive message from client
+		if ((received_message_size = recv(client_socket, received_buffer, RECEIVE_BUFFER_SIZE, 0)) < 0) {
 			fprintf(stderr, "Receive failed.");
 		}
-	}
+		printf("Size Received: %d\n", received_message_size);
+
+		for (int i = 0; i < received_message_size; i++) {
+			message[total_message_size + i] = received_buffer[i];
+		}
+
+		memset(received_buffer, 0, RECEIVE_BUFFER_SIZE);
+
+		total_message_size += received_message_size;
+
+		if (total_message_size > message_capacity) {
+			message_capacity += RECEIVE_BUFFER_SIZE;
+
+			message = realloc(message, message_capacity);
+		}
+	} while (received_message_size > 0);
+
+	printf("Done – %s – Size: %d vs %d\n", message, total_message_size, message_capacity);
 
 	close(client_socket);
 }
