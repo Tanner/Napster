@@ -93,8 +93,6 @@ void add_file(int sock, char *string) {
 
 	printf("Sent %s", message);
 
-	// while (1) { }
-
 	printf("Done!");
 }
 

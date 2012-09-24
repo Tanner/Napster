@@ -12,6 +12,8 @@
 
 void handleClient(int client_socket);
 
+int validMessage(char *message);
+
 int main(int argc, char *argv[])
 {
 	int server_socket;
@@ -100,9 +102,28 @@ void handleClient(int client_socket) {
 
 			message = realloc(message, message_capacity);
 		}
-	} while (received_message_size > 0);
+	} while (validMessage(message) && received_message_size > 0);
 
-	printf("Done – %s – Size: %d vs %d\n", message, total_message_size, message_capacity);
+	printf("Done – %s – Size: %d\n", message, total_message_size);
 
 	close(client_socket);
+}
+
+/**
+ * Check to see if a string is a valid request message.
+ * @param  message String
+ * @return 1 or 0 for validity
+ */
+int validMessage(char *message) {
+	int length = strlen(message);
+
+	// Valid message ends in \r\n\r\n
+	
+	if (length < 4) {
+		return 0;
+	}
+	return message[length] == '\n' &&
+			message[length - 1] == '\r' &&
+			message[length - 2] == '\n' &&
+			message[length - 3] == '\r';
 }
