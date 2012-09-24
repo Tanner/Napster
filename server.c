@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include "utilities.h"
+
 #define MAX_PENDING 5
 
 #define RECEIVE_BUFFER_SIZE 32

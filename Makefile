@@ -1,10 +1,10 @@
 CC = gcc
 CFLAGS = -Wall -Werror -ansi -pedantic -std=c99 -O0 -g
 
-CLIENT_OBJ = client.o
+CLIENT_OBJ = client.o utilities.o
 CLIENT_TARGET = client
 
-SERVER_OBJ = server.o
+SERVER_OBJ = server.o utilities.o
 SERVER_TARGET = server
 
 all: $(CLIENT_TARGET) $(SERVER_TARGET)
