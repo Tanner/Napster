@@ -10,7 +10,7 @@
 
 #define MAX_PENDING 5
 
-void handleClient(int client_socket);
+void handle_client(int client_socket, struct sockaddr_in client_address);
 
 int main(int argc, char *argv[])
 {
@@ -63,16 +63,14 @@ int main(int argc, char *argv[])
 		}
 
 		// Handle the client
-		printf("Handling client %s\n", inet_ntoa(client_address.sin_addr));
-
-		handleClient(client_socket);
+		handle_client(client_socket, client_address);
 	}
 }
 
-void handleClient(int client_socket) {
+void handle_client(int client_socket, struct sockaddr_in client_address) {
 	char *message = get_response(client_socket);
 
-	printf("Done – %s – Size: %d\n", message, (int) strlen(message));
+	printf("Got request from %s – %s – Size: %d\n", inet_ntoa(client_address.sin_addr), message, (int) strlen(message));
 
 	free(message);
 
