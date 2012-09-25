@@ -72,6 +72,15 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 	printf("Got request from %s – %s – Size: %d\n", inet_ntoa(client_address.sin_addr), message, (int) strlen(message));
 
+	char **parse = parse_message(message);
+
+	if (parse) {	
+		printf("Command: '%s'\n", parse[0]);
+		printf("File Name: '%s'\n", parse[1]);
+	} else {
+		printf("Invalid request.");
+	}
+
 	free(message);
 
 	close(client_socket);

@@ -57,6 +57,75 @@ int valid_message(char *message) {
 }
 
 /**
+ * Parse a message into command and args.
+ * @param  message String
+ * @return Array of strings containing command and args
+ */
+char ** parse_message(char *message) {
+	// Trim '\n' from end of message
+	message[strlen(message) - 1] = '\0';
+
+	// Alloc result array – start at 1 for minimum of just command
+	char **result = calloc(1, sizeof(char *) * 1);
+	assert(result);
+
+	// Get the command
+	char *command = calloc(1, sizeof(char *) * MAX_COMMAND_LENGTH);
+	assert(command);
+
+	int command_end_index = 0;
+
+	for (int i = 0; i < strlen(message) && i < MAX_COMMAND_LENGTH; i++) {
+		if (message[i] == ' ') {
+			command_end_index = i;
+
+			for (int j = 0; j < i; j++) {
+				command[j] = message[j];
+			}
+
+			break;
+		}
+	}
+
+	// If the command is not there, return 0
+	if (strlen(command) <= 0) {
+		free(command);
+		free(result);
+
+		return 0;
+	}
+
+	// Otherwise, store the command and pick out arguments
+	result[0] = command;
+
+	if (strcmp(command, "ADD") == 0) {
+		// Get the file name
+		char *file_name = calloc(1, sizeof(char *) * ADD_MAX_FILE_NAME_LENGTH);
+
+		int file_name_length = 0;
+
+		for (int i = command_end_index; i < strlen(message) && i < ADD_MAX_FILE_NAME_LENGTH; i++) {
+			file_name[i - command_end_index - 1] = message[i];
+
+			file_name_length = i;
+		}
+
+		// Add null terminator
+		file_name[file_name_length] = '\0';
+
+		result[1] = file_name;
+	} else {
+		// If not matching command, return 0
+		free(command);
+		free(result);
+
+		return 0;
+	}
+
+	return result;
+}
+
+/**
  * Split a string into x variable.
  *
  * @param *input		String to split up
