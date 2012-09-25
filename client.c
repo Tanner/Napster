@@ -87,13 +87,11 @@ int main(int argc, char *argv[]) {
 void add_file(int sock, char *string) {
 	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
 
-	snprintf(message, SEND_MESSAGE_SIZE, "ADD: %s\r\n\r\n", string);
+	snprintf(message, SEND_MESSAGE_SIZE, "ADD: %s\n", string);
 
 	send(sock, message, strlen(message), 0);
 
 	printf("Sent %s", message);
-
-	printf("Done!");
 }
 
 void echo(int sock, char *string) {
@@ -101,7 +99,7 @@ void echo(int sock, char *string) {
 
 	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
 
-	snprintf(message, SEND_MESSAGE_SIZE, "ECHO: %s\r\n\r\n", string);
+	snprintf(message, SEND_MESSAGE_SIZE, "ECHO: %s\n", string);
 
 	// Send the string to the server
 	if (send(sock, message, strlen(message), 0) != strlen(message)) {

@@ -9,7 +9,7 @@ char * get_response(int sock) {
 	int total_message_size = 0;
 	int message_capacity = RECEIVE_BUFFER_SIZE;
 
-	char *message = malloc(sizeof(char) * RECEIVE_BUFFER_SIZE);
+	char *message = calloc(1, sizeof(char) * RECEIVE_BUFFER_SIZE);
 	assert(message);
 
 	// Send received string and receive again until end of transmission
@@ -20,7 +20,6 @@ char * get_response(int sock) {
 
 			return 0;
 		}
-		printf("Size Received: %d\n", received_message_size);
 
 		for (int i = 0; i < received_message_size; i++) {
 			message[total_message_size + i] = received_buffer[i];
@@ -48,15 +47,13 @@ char * get_response(int sock) {
 int valid_message(char *message) {
 	int length = strlen(message);
 
-	// Valid message ends in \r\n\r\n
-	
-	if (length < 4) {
+	// Valid message ends in \n
+
+	if (length < 1) {
 		return 0;
 	}
-	return message[length] == '\n' &&
-			message[length - 1] == '\r' &&
-			message[length - 2] == '\n' &&
-			message[length - 3] == '\r';
+
+	return message[length - 1] == '\n';
 }
 
 /**
