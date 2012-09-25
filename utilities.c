@@ -106,7 +106,7 @@ char ** parse_message(char *message) {
 
 		int file_name_length = 0;
 
-		for (int i = command_end_index; i < strlen(message) && i < MAX_FILE_NAME_LENGTH; i++) {
+		for (int i = command_end_index; i < strlen(message) && i <= MAX_FILE_NAME_LENGTH + command_end_index; i++) {
 			file_name[i - command_end_index - 1] = message[i];
 
 			file_name_length = i;
