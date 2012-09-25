@@ -21,20 +21,22 @@ char * get_response(int sock) {
 			return 0;
 		}
 
-		for (int i = 0; i < received_message_size; i++) {
-			message[total_message_size + i] = received_buffer[i];
+		if (received_message_size > 0) {
+			for (int i = 0; i < received_message_size; i++) {
+				message[total_message_size + i] = received_buffer[i];
+			}
+
+			memset(received_buffer, 0, RECEIVE_BUFFER_SIZE);
+
+			total_message_size += received_message_size;
+
+			if (total_message_size >= message_capacity) {
+				message_capacity += RECEIVE_BUFFER_SIZE;
+
+				message = realloc(message, message_capacity);
+			}
 		}
-
-		memset(received_buffer, 0, RECEIVE_BUFFER_SIZE);
-
-		total_message_size += received_message_size;
-
-		if (total_message_size > message_capacity) {
-			message_capacity += RECEIVE_BUFFER_SIZE;
-
-			message = realloc(message, message_capacity);
-		}
-	} while (valid_message(message) && received_message_size > 0);
+	} while (!valid_message(message) && received_message_size > 0);
 
 	return message;
 }
