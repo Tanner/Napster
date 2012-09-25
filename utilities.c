@@ -68,7 +68,7 @@ char ** split(char *input, char *delimiter) {
 
 	// Count the number of chunks that exist in the string
 
-	input_copy = malloc(sizeof(char) * strlen(input));
+	input_copy = calloc(1, sizeof(char) * strlen(input));
 	assert(input_copy);
 
 	strcpy(input_copy, input);
@@ -88,7 +88,7 @@ char ** split(char *input, char *delimiter) {
 
 	// Create an array of that size (to hold all the chunks)
 
-	char **split = malloc(sizeof(char *) * count);
+	char **split = calloc(1, sizeof(char *) * count);
 	assert(split);
 
 	// Begin to assign the chunks into the array
