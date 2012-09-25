@@ -8,6 +8,8 @@
 
 #include "utilities.h"
 
+#define MAX_INPUT_LENGTH 1024
+
 #define SEND_MESSAGE_SIZE 512
 #define RECEIVE_BUFFER_SIZE 32
 
@@ -19,6 +21,7 @@ void add_file(int sock, char *string);
 void echo(int sock, char *string);
 
 int arguments_exist(char *args);
+int check_file_name_length(char *file_name);
 
 int server_command(char *server_ip, unsigned int server_port, int (*pre_connect_function)(char*), void (*command_function)(int, char*), char *args);
 
@@ -43,7 +46,7 @@ int main(int argc, char *argv[]) {
 		server_port = DEFAULT_SERVER_PORT;
 	}
 
-	char *input = malloc(sizeof(char) * 100);
+	char *input = malloc(sizeof(char) * MAX_INPUT_LENGTH);
 	assert(input);
 
 	char **args = 0;
@@ -53,7 +56,7 @@ int main(int argc, char *argv[]) {
 
 		// Get input from the user
 		printf("%s", PROMPT);
-		console_status = fgets(input, 100, stdin);
+		console_status = fgets(input, MAX_INPUT_LENGTH, stdin);
 
 		if (console_status) {
 			if (args) {
@@ -70,7 +73,7 @@ int main(int argc, char *argv[]) {
 				} else if (strcmp(command, "echo") == 0) {
 					server_command(server_ip, server_port, arguments_exist, echo, args[1]);
 				} else if (strcmp(command, "add") == 0) {
-					server_command(server_ip, server_port, arguments_exist, add_file, args[1]);
+					server_command(server_ip, server_port, check_file_name_length, add_file, args[1]);
 				}
 			}
 		}
@@ -93,7 +96,7 @@ void add_file(int sock, char *string) {
 
 	send(sock, message, strlen(message), 0);
 
-	printf("Sent %s", message);
+	printf("Sent %s\n", message);
 }
 
 void echo(int sock, char *string) {
@@ -127,7 +130,27 @@ void echo(int sock, char *string) {
 }
 
 int arguments_exist(char *args) {
-	return args && strlen(args) > 0;
+	if (args && strlen(args) > 0) {
+		return 1;
+	} else {
+		printf("Command must have argument(s).");
+
+		return 0;
+	}
+}
+
+int check_file_name_length(char *file_name) {
+	if (!arguments_exist(file_name)) {
+		return 0;
+	}
+
+	if (file_name && strlen(file_name) > 0 && strlen(file_name) <= MAX_FILE_NAME_LENGTH) {
+		return 1;
+	} else {
+		printf("File name cannot be longer than %d characters.", MAX_FILE_NAME_LENGTH);
+
+		return 0;
+	}
 }
 
 /**
@@ -143,7 +166,7 @@ int arguments_exist(char *args) {
 int server_command(char *server_ip, unsigned int server_port, int (*pre_connect_function)(char*), void (*command_function)(int, char*), char *args) {
 	// If args don't pass the test, don't do anything
 	if (pre_connect_function && pre_connect_function(args) == 0) {
-		printf("Command is invalid. Try 'help'.\n");
+		printf(" Try 'help'.\n");
 
 		return -1;
 	}	

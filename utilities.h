@@ -9,7 +9,7 @@
 
 #define MAX_COMMAND_LENGTH 256
 
-#define MAX_FILE_NAME_LENGTH 1024
+#define MAX_FILE_NAME_LENGTH 256
 
 char * get_response(int sock);
 int valid_message(char *message);
