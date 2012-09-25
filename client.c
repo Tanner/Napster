@@ -18,7 +18,9 @@
 void add_file(int sock, char *string);
 void echo(int sock, char *string);
 
-int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args);
+int arguments_exist(char *args);
+
+int server_command(char *server_ip, unsigned int server_port, int (*pre_connect_function)(char*), void (*command_function)(int, char*), char *args);
 
 int server_connect(char *server_ip, unsigned int server_port);
 int server_disconnect(int sock);
@@ -66,9 +68,9 @@ int main(int argc, char *argv[]) {
 				if (strcmp(command, "quit") == 0) {
 					break;
 				} else if (strcmp(command, "echo") == 0) {
-					server_command(server_ip, server_port, echo, args[1]);
+					server_command(server_ip, server_port, arguments_exist, echo, args[1]);
 				} else if (strcmp(command, "add") == 0) {
-					server_command(server_ip, server_port, add_file, args[1]);
+					server_command(server_ip, server_port, arguments_exist, add_file, args[1]);
 				}
 			}
 		}
@@ -124,16 +126,28 @@ void echo(int sock, char *string) {
 	printf("\n");
 }
 
+int arguments_exist(char *args) {
+	return args && strlen(args) > 0;
+}
+
 /**
  * Connects to the server and runs a command using that socket.
  *
- * @param server_ip			Server IP (dotted quad)
- * @param server_port		Port Number
- * @param command_function	Function that takes in socket descriptor and char*
- * @param args				Args to pass to command_function
+ * @param server_ip				Server IP (dotted quad)
+ * @param server_port			Port Number
+ * @param pre_connect_function	Function that validates the input before connecting
+ * @param command_function		Function that takes in socket descriptor and char*
+ * @param args					Args to pass to command_function
  * @return Result of socket creation
  */
-int server_command(char *server_ip, unsigned int server_port, void (*command_function)(int, char*), char *args) {
+int server_command(char *server_ip, unsigned int server_port, int (*pre_connect_function)(char*), void (*command_function)(int, char*), char *args) {
+	// If args don't pass the test, don't do anything
+	if (pre_connect_function && pre_connect_function(args) == 0) {
+		printf("Command is invalid. Try 'help'.\n");
+
+		return -1;
+	}	
+
 	int sock = server_connect(server_ip, server_port);
 
 	if (sock == -1) {
