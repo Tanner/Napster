@@ -76,7 +76,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 	if (parse) {	
 		printf("Command: '%s'\n", parse[0]);
-		printf("File Name: '%s'\n", parse[1]);
+		printf("File Name: '%s' (length %d)\n", parse[1], (int) strlen(parse[1]));
 	} else {
 		printf("Invalid request.");
 	}
