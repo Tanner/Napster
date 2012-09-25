@@ -100,11 +100,11 @@ char ** parse_message(char *message) {
 
 	if (strcmp(command, "ADD") == 0) {
 		// Get the file name
-		char *file_name = calloc(1, sizeof(char *) * ADD_MAX_FILE_NAME_LENGTH);
+		char *file_name = calloc(1, sizeof(char *) * MAX_FILE_NAME_LENGTH);
 
 		int file_name_length = 0;
 
-		for (int i = command_end_index; i < strlen(message) && i < ADD_MAX_FILE_NAME_LENGTH; i++) {
+		for (int i = command_end_index; i < strlen(message) && i < MAX_FILE_NAME_LENGTH; i++) {
 			file_name[i - command_end_index - 1] = message[i];
 
 			file_name_length = i;
