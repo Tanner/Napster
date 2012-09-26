@@ -108,7 +108,7 @@ char ** parse_message(char *message, int *size) {
 
 	if (strcmp(command, "ADD") == 0 || strcmp(command, "REMOVE") == 0) {
 		// Get the file name
-		char *file_name = calloc(1, sizeof(char *) * MAX_FILE_NAME_LENGTH);
+		char *file_name = calloc(1, sizeof(char) * MAX_FILE_NAME_LENGTH);
 
 		int file_name_length = 0;
 
@@ -121,8 +121,10 @@ char ** parse_message(char *message, int *size) {
 		// Add null terminator
 		file_name[file_name_length] = '\0';
 
-		result[1] = file_name;
 		*size += 1;
+
+        result = realloc(result, sizeof(char *) * *size);
+		result[1] = file_name;
 	} else if (strcmp(command, "LIST") == 0) {
 		// Ignore any other arguments
 	} else {
