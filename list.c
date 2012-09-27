@@ -444,16 +444,16 @@ int size(list* llist)
 	* @param llist a pointer to a linked list.
 	* @param search data to search for the occurence.
 	* @param compare_func a pointer to a function that returns true if two data items are equal @see equal_op.
-	* @return 1 if the data is indeed in the linked list 0 otherwise.
+	* @return The data if the data is indeed in the linked list 0 otherwise.
 	*/
-int find_occurrence(list* llist, const void* search, equal_op compare_func)
+void * find_occurrence(list* llist, const void* search, equal_op compare_func)
 {
 	node *temp = llist->head;
 
 	if (temp != NULL) {
 		do {
 			if (compare_func(search, temp->data)) {
-				return 1;
+				return temp->data;
 			}
 			temp = temp->next;
 		} while (temp != llist->head);

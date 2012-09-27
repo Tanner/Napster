@@ -64,7 +64,7 @@ int is_empty(list* llist);
 int size(list* llist);
 
 /* Searching */
-int find_occurrence(list* llist, const void* search, equal_op compare_func);
+void* find_occurrence(list* llist, const void* search, equal_op compare_func);
 
 /* Freeing */
 void empty_list(list* llist, list_op free_func);
