@@ -1,8 +1,8 @@
 #include "server.h"
+#include "list.h"
 #include "utilities.h"
 
-file_source** file_sources;
-int file_source_count;
+list* file_sources_list;
 
 void handle_client(int client_socket, struct sockaddr_in client_address);
 
@@ -45,11 +45,8 @@ int main(int argc, char *argv[])
 		exit(2);
 	}
 
-	// Create the array to hold file sources
-	file_sources = calloc(1, sizeof(file_source));
-	assert(file_sources);
-
-	file_source_count = 0;
+	// Create file source array linked list
+	file_sources_list = create_list();
 
 	printf("Server started...\n");
 
