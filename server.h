@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include "list.h"
+
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
@@ -13,8 +15,7 @@
 
 typedef struct struct_file_source {
 	struct sockaddr_in address;
-	int file_count;
-	char **files;
+	list *files;
 } file_source;
 
 #endif
