@@ -80,6 +80,12 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 		if (strcmp(parse[0], "ADD") == 0) {
 			printf("File Name: '%s' (length %d)\n", parse[1], (int) strlen(parse[1]));
 		}
+
+		for (int i = 0; i < sizeof(parse) / sizeof(char *); i++) {
+			free(parse[i]);
+		}
+
+		free(parse);
 	} else {
 		printf("Invalid request.");
 	}
