@@ -74,18 +74,18 @@ int main(int argc, char *argv[])
 void handle_client(int client_socket, struct sockaddr_in client_address) {
 	char *message = get_response(client_socket);
 
-	printf("Got request from %s\n", inet_ntoa(client_address.sin_addr));
+	printf("Got request from %s – ", inet_ntoa(client_address.sin_addr));
 
 	char **parse = parse_message(message);
 
 	if (parse) {
-		printf("Command: '%s'\n", parse[0]);
+		printf("%s\n", parse[0]);
 
 		if (strcmp(parse[0], "ADD") == 0) {
-			printf("File Name: '%s' (length %d)\n", parse[1], (int) strlen(parse[1]));
-
 			add_file_from_source(client_address, parse[1]);
 		}
+
+		printf("Updated file source list:\n");
 
 		traverse(file_sources_list, print_source);
 
@@ -95,7 +95,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 		free(parse);
 	} else {
-		printf("Invalid request.");
+		printf("Invalid request.\n");
 	}
 
 	free(message);
@@ -116,12 +116,18 @@ void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 			char *file = find_occurrence(source->files, file_name, compare_file_names);
 
 			if (!file) {
+				printf("Adding file to existing source...\n");
+
 				push_front(source->files, file_name);
+			} else {
+				printf("File already exists in source; not adding again...\n");
 			}
 
 			return;
 		}
 	}
+
+	printf("Creating new source...\n");
 
 	file_source *new_source = malloc(sizeof(file_source));
 	assert(new_source);
