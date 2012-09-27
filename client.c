@@ -18,7 +18,6 @@
 #define PROMPT "(napster) "
 
 void add_file(int sock, char *string);
-void echo(int sock, char *string);
 
 int arguments_exist(char *args);
 int check_file_name_length(char *file_name);
@@ -70,8 +69,6 @@ int main(int argc, char *argv[]) {
 			if (command) {
 				if (strcmp(command, "quit") == 0) {
 					break;
-				} else if (strcmp(command, "echo") == 0) {
-					server_command(server_ip, server_port, arguments_exist, echo, args[1]);
 				} else if (strcmp(command, "add") == 0) {
 					server_command(server_ip, server_port, check_file_name_length, add_file, args[1]);
 				}
@@ -102,36 +99,6 @@ void add_file(int sock, char *string) {
 	send(sock, message, strlen(message), 0);
 
 	printf("Sent %s\n", message);
-}
-
-void echo(int sock, char *string) {
-	char buffer[RECEIVE_BUFFER_SIZE];
-
-	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
-
-	snprintf(message, SEND_MESSAGE_SIZE, "ECHO %s\n", string);
-
-	// Send the string to the server
-	if (send(sock, message, strlen(message), 0) != strlen(message)) {
-		fprintf(stderr, "Sent a different number of bytes than expected.\n");
-	}
-
-	// Receive data from the server
-	printf("Received: ");
-
-	int total_bytes_received = 0;
-	int bytes_received = 0;
-	while (total_bytes_received < strlen(message)) {
-		if ((bytes_received = recv(sock, buffer, RECEIVE_BUFFER_SIZE - 1, 0)) <= 0) {
-			fprintf(stderr, "Received failed or connection closed prematurely.\n");
-		}
-
-		total_bytes_received += bytes_received;
-		buffer[bytes_received] = '\0';
-		printf("%s", buffer);
-	}
-
-	printf("\n");
 }
 
 /**
