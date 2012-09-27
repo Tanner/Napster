@@ -89,6 +89,11 @@ int main(int argc, char *argv[]) {
 	exit(0);
 }
 
+/**
+ * Add a file command.
+ * @param sock   Socket descriptor
+ * @param string File name to add to server's list
+ */
 void add_file(int sock, char *string) {
 	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
 
@@ -129,6 +134,11 @@ void echo(int sock, char *string) {
 	printf("\n");
 }
 
+/**
+ * Returns 1 if the arguments exist and are not of size 0.
+ * @param  args Arguments string
+ * @return 1 for true, 0 for false
+ */
 int arguments_exist(char *args) {
 	if (args && strlen(args) > 0) {
 		return 1;
@@ -139,6 +149,11 @@ int arguments_exist(char *args) {
 	}
 }
 
+/**
+ * Makes sure the file name length is valid.
+ * @param  file_name File name string
+ * @return 1 for true, 0 for false
+ */
 int check_file_name_length(char *file_name) {
 	if (!arguments_exist(file_name)) {
 		return 0;
