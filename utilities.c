@@ -82,7 +82,7 @@ char ** parse_message(char *message) {
 			command_end_index = i;
 
 			for (int j = 0; j < i; j++) {
-				command[j] = message[j];
+				memcpy(&command[j], &message[j], 1);
 			}
 
 			break;
@@ -107,7 +107,7 @@ char ** parse_message(char *message) {
 		int file_name_length = 0;
 
 		for (int i = command_end_index; i < strlen(message) && i <= MAX_FILE_NAME_LENGTH + command_end_index; i++) {
-			file_name[i - command_end_index - 1] = message[i];
+			memcpy(&file_name[i - command_end_index - 1], &message[i], 1);
 
 			file_name_length = i;
 		}
