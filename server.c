@@ -1,10 +1,17 @@
 #include "server.h"
-#include "list.h"
 #include "utilities.h"
 
 list* file_sources_list;
 
 void handle_client(int client_socket, struct sockaddr_in client_address);
+
+void add_file_from_source(struct sockaddr_in client_address, char *file_name);
+
+void print_source(void *data);
+void print_files(void *data);
+
+int compare_source_addresses(const void *a, const void *b);
+int compare_file_names(const void *a, const void *b);
 
 int main(int argc, char *argv[])
 {
@@ -67,7 +74,7 @@ int main(int argc, char *argv[])
 void handle_client(int client_socket, struct sockaddr_in client_address) {
 	char *message = get_response(client_socket);
 
-	printf("Got request from %s – %s – Size: %d\n", inet_ntoa(client_address.sin_addr), message, (int) strlen(message));
+	printf("Got request from %s\n", inet_ntoa(client_address.sin_addr));
 
 	char **parse = parse_message(message);
 
@@ -76,7 +83,11 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 		if (strcmp(parse[0], "ADD") == 0) {
 			printf("File Name: '%s' (length %d)\n", parse[1], (int) strlen(parse[1]));
+
+			add_file_from_source(client_address, parse[1]);
 		}
+
+		traverse(file_sources_list, print_source);
 
 		for (int i = 0; i < sizeof(parse) / sizeof(char *); i++) {
 			free(parse[i]);
@@ -90,4 +101,52 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 	free(message);
 
 	close(client_socket);
+}
+
+void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
+	if (size(file_sources_list) != 0) {
+		file_source *source = find_occurrence(file_sources_list, &client_address, compare_source_addresses);
+
+		if (source) {
+			char *file = find_occurrence(source->files, file_name, compare_file_names);
+
+			if (!file) {
+				push_front(source->files, file_name);
+			}
+
+			return;
+		}
+	}
+
+	file_source *new_source = malloc(sizeof(file_source));
+	assert(new_source);
+
+	new_source->address = client_address;
+	new_source->files = create_list();
+
+	push_front(new_source->files, file_name);
+	push_front(file_sources_list, new_source);
+}
+
+int compare_source_addresses(const void *a, const void *b) {
+	struct sockaddr_in *needle = (struct sockaddr_in *) a;
+	struct sockaddr_in haystack = ((file_source *) b)->address;
+
+	return strcmp(inet_ntoa(needle->sin_addr), inet_ntoa(haystack.sin_addr)) == 0;
+}
+
+int compare_file_names(const void *a, const void *b) {
+	return strcmp(a, b) == 0;
+}
+
+void print_source(void *data) {
+	file_source *source = (file_source *) data;
+
+	printf("%s:\n", inet_ntoa(source->address.sin_addr));
+
+	traverse(source->files, print_files);
+}
+
+void print_files(void *data) {
+	printf("\t%s\n", (char *)data);
 }
