@@ -103,6 +103,11 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 	close(client_socket);
 }
 
+/**
+ * Adds file_name to the client_address.
+ * @param client_address sockaddr_in struct for client
+ * @param file_name      File name to add
+ */
 void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 	if (size(file_sources_list) != 0) {
 		file_source *source = find_occurrence(file_sources_list, &client_address, compare_source_addresses);
@@ -128,6 +133,12 @@ void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 	push_front(file_sources_list, new_source);
 }
 
+/**
+ * Compares the source addresses given an address and a file source.
+ * @param  a Source address to match to
+ * @param  b File source to determine if it is matching
+ * @return 1 for true, 0 for false
+ */
 int compare_source_addresses(const void *a, const void *b) {
 	struct sockaddr_in *needle = (struct sockaddr_in *) a;
 	struct sockaddr_in haystack = ((file_source *) b)->address;
@@ -135,10 +146,20 @@ int compare_source_addresses(const void *a, const void *b) {
 	return strcmp(inet_ntoa(needle->sin_addr), inet_ntoa(haystack.sin_addr)) == 0;
 }
 
+/**
+ * Compares two files names to see if they are equal.
+ * @param  a First file name
+ * @param  b Second file name
+ * @return 1 for true, 0 for false
+ */
 int compare_file_names(const void *a, const void *b) {
 	return strcmp(a, b) == 0;
 }
 
+/**
+ * Prints out a source and all of its files.
+ * @param data File source
+ */
 void print_source(void *data) {
 	file_source *source = (file_source *) data;
 
@@ -147,6 +168,10 @@ void print_source(void *data) {
 	traverse(source->files, print_files);
 }
 
+/**
+ * Prints out a file.
+ * @param data File name
+ */
 void print_files(void *data) {
 	printf("\t%s\n", (char *)data);
 }
