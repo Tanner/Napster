@@ -18,6 +18,7 @@
 #define PROMPT "(napster) "
 
 void add_file(int sock, char *string);
+void list_files(int sock, char *args);
 
 int arguments_exist(char *args);
 int check_file_name_length(char *file_name);
@@ -71,6 +72,8 @@ int main(int argc, char *argv[]) {
 					break;
 				} else if (strcmp(command, "add") == 0) {
 					server_command(server_ip, server_port, check_file_name_length, add_file, args[1]);
+				} else if (strcmp(command, "list") == 0) {
+					server_command(server_ip, server_port, NULL, list_files, NULL);
 				}
 			}
 		}
@@ -97,8 +100,17 @@ void add_file(int sock, char *string) {
 	snprintf(message, SEND_MESSAGE_SIZE, "ADD %s\n", string);
 
 	send(sock, message, strlen(message), 0);
+}
 
-	printf("Sent %s\n", message);
+/**
+ * List all of the files on the server.
+ * @param sock Socket descriptor
+ * @param args Arguments
+ */
+void list_files(int sock, char *args) {
+	char *message = "LIST\n";
+
+	send(sock, message, strlen(message), 0);
 }
 
 /**
