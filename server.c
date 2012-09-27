@@ -1,14 +1,5 @@
-#include <stdio.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <assert.h>
-
+#include "server.h"
 #include "utilities.h"
-
-#define MAX_PENDING 5
 
 void handle_client(int client_socket, struct sockaddr_in client_address);
 
