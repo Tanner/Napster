@@ -5,6 +5,7 @@ list* file_sources_list;
 
 void handle_client(int client_socket, struct sockaddr_in client_address);
 
+void list_all_files(int client_socket);
 void add_file_from_source(struct sockaddr_in client_address, char *file_name);
 
 void print_source(void *data);
@@ -83,6 +84,8 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 		if (strcmp(parse[0], "ADD") == 0) {
 			add_file_from_source(client_address, parse[1]);
+		} else if (strcmp(parse[0], "LIST") == 0) {
+			list_all_files(client_socket);
 		}
 
 		printf("Updated file source list:\n");
@@ -101,6 +104,26 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 	free(message);
 
 	close(client_socket);
+}
+
+void list_all_files(int client_socket) {
+	if (size(file_sources_list) == 0) {
+		char *message = "LIST 0\n";
+
+		send(client_socket, message, strlen(message), 0);
+	} else {
+		int number_file_sources = size(file_sources_list);
+		for (int i = 0; i < number_file_sources; i++) {
+			file_source *source = (file_source *) get_index(file_sources_list, i);
+
+			int number_files = size(source->files);
+			for (int j = 0; j < number_files; j++) {
+				char *file_name = (char *) get_index(source->files, j);
+
+				printf("%s\n", file_name);
+			}
+		}
+	}
 }
 
 /**
