@@ -122,7 +122,7 @@ void list_all_files(int client_socket, struct sockaddr_in client_address) {
 			total_number_files += size(source->files);
 		}
 
-		char *file_list;
+		char *file_list = "";
 
 		for (int i = 0; i < number_file_sources; i++) {
 			file_source *source = (file_source *) get_index(file_sources_list, i);
