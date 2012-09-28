@@ -84,13 +84,13 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 		if (strcmp(parse[0], "ADD") == 0) {
 			add_file_from_source(client_address, parse[1]);
+
+			printf("Updated file source list:\n");
+
+			traverse(file_sources_list, print_source);
 		} else if (strcmp(parse[0], "LIST") == 0) {
 			list_all_files(client_socket);
 		}
-
-		printf("Updated file source list:\n");
-
-		traverse(file_sources_list, print_source);
 
 		for (int i = 0; i < sizeof(parse) / sizeof(char *); i++) {
 			free(parse[i]);
