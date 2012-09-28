@@ -16,6 +16,12 @@ All messsages are begin with a command and are ended with a new line. Between th
 
 The add message must begin with 'ADD' in all uppercase letters followed by space and then the desired file path to the text file. The file path must not contain spaces.
 
+## Removing a File
+### Request
+`REMOVE path\n`
+
+The remove message must begin with 'REMOVE' in all uppercase lettesr followed by a space and then the desired file path to the text file to remove. The file path must not contain spaces.
+
 ## Listing all Files
 ### Request
 `LIST\n`
