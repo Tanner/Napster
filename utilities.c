@@ -78,10 +78,14 @@ char ** parse_message(char *message) {
 	int command_end_index = 0;
 
 	for (int i = 0; i < strlen(message) && i < MAX_COMMAND_LENGTH; i++) {
-		if (message[i] == ' ') {
+		if (message[i] == ' ' || i == strlen(message) - 1) {
 			command_end_index = i;
 
-			for (int j = 0; j < i; j++) {
+			if (i == strlen(message) - 1) {
+				command_end_index++;
+			}
+
+			for (int j = 0; j < command_end_index; j++) {
 				memcpy(&command[j], &message[j], 1);
 			}
 
@@ -116,6 +120,8 @@ char ** parse_message(char *message) {
 		file_name[file_name_length] = '\0';
 
 		result[1] = file_name;
+	} else if (strcmp(command, "LIST") == 0) {
+		// Ignore any other arguments
 	} else {
 		// If not matching command, return 0
 		free(command);
