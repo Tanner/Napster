@@ -112,6 +112,27 @@ void list_files(int sock, char *args) {
 	char *message = "LIST\n";
 
 	send(sock, message, strlen(message), 0);
+
+	char *response = get_response(sock);
+
+	int number_response_args = 0;
+	char **response_args = split(response, " ", &number_response_args);
+
+	if (strcmp(response_args[0], "LIST") == 0) {
+		int number_files = (int) strtol(response_args[1], NULL, 10);
+
+		if (number_response_args != number_files + 2) {
+			fprintf(stderr, "Did not receive all the files the server has; printing what I have...\n");
+		}
+
+		printf("Server File List:\n");
+		
+		for (int i = 2; i < number_response_args; i++) {
+			printf("%d) %s\n", i - 1, response_args[i]);
+		}
+	} else {
+		fprintf(stderr, "Unexpected response - expected LIST, but got %s.\n", response_args[0]);
+	}
 }
 
 /**
