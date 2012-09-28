@@ -5,7 +5,7 @@ list* file_sources_list;
 
 void handle_client(int client_socket, struct sockaddr_in client_address);
 
-void list_all_files(int client_socket);
+void list_all_files(int client_socket, struct sockaddr_in client_address);
 void add_file_from_source(struct sockaddr_in client_address, char *file_name);
 
 void print_source(void *data);
@@ -89,7 +89,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 			traverse(file_sources_list, print_source);
 		} else if (strcmp(parse[0], "LIST") == 0) {
-			list_all_files(client_socket);
+			list_all_files(client_socket, client_address);
 		}
 
 		for (int i = 0; i < sizeof(parse) / sizeof(char *); i++) {
@@ -106,7 +106,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 	close(client_socket);
 }
 
-void list_all_files(int client_socket) {
+void list_all_files(int client_socket, struct sockaddr_in client_address) {
 	if (size(file_sources_list) == 0) {
 		char *message = "LIST 0\n";
 
@@ -142,7 +142,9 @@ void list_all_files(int client_socket) {
 		char *message;
 		asprintf(&message, "LIST %d%s\n", total_number_files, file_list);
 
-		printf("%s\n", message);
+		printf("Sending response back to %s – LIST\n", inet_ntoa(client_address.sin_addr));
+
+		send(client_socket, message, strlen(message), 0);
 	}
 }
 
