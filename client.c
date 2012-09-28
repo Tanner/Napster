@@ -126,7 +126,7 @@ void list_files(int sock, char *args) {
 		}
 
 		printf("Server File List:\n");
-		
+
 		for (int i = 2; i < number_response_args; i++) {
 			printf("%d) %s\n", i - 1, response_args[i]);
 		}
@@ -193,7 +193,7 @@ int server_command(char *server_ip, unsigned int server_port, int (*pre_connect_
 		return -1;
 	} else {
 		command_function(sock, args);
-		close(sock);
+		server_disconnect(sock);
 
 		return 0;
 	}
@@ -227,8 +227,6 @@ int server_connect(char *server_ip, unsigned int server_port) {
 		return -1;
 	}
 
-	printf("Connected to the server!\n");
-
 	return sock;
 }
 
@@ -239,7 +237,5 @@ int server_connect(char *server_ip, unsigned int server_port) {
  * @return Result of close
  */
 int server_disconnect(int sock) {
-	printf("Disconnecting from server!\n");
-
 	return close(sock);
 }
