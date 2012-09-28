@@ -75,6 +75,11 @@ int main(int argc, char *argv[]) {
 					server_command(server_ip, server_port, check_file_name_length, add_file, args[1]);
 				} else if (strcmp(command, "list") == 0) {
 					server_command(server_ip, server_port, NULL, list_files, NULL);
+				} else if (strcmp(command, "help") == 0) {
+					printf("Commands:\n");
+					printf("add filename\n");
+					printf("remove filename\n");
+					printf("list\n");
 				}
 			}
 		}
