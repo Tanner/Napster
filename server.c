@@ -7,6 +7,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address);
 
 void list_all_files(int client_socket, struct sockaddr_in client_address);
 void add_file_from_source(struct sockaddr_in client_address, char *file_name);
+void remove_file_from_source(struct sockaddr_in client_address, char *file_name);
 
 void print_source(void *data);
 void print_files(void *data);
@@ -88,6 +89,12 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 			printf("Updated file source list:\n");
 
 			traverse(file_sources_list, print_source);
+		} else if (strcmp(parse[0], "REMOVE") == 0) {
+			remove_file_from_source(client_address, parse[1]);
+
+			printf("Updated file source list:\n");
+
+			traverse(file_sources_list, print_source);
 		} else if (strcmp(parse[0], "LIST") == 0) {
 			list_all_files(client_socket, client_address);
 		}
@@ -149,6 +156,31 @@ void list_all_files(int client_socket, struct sockaddr_in client_address) {
 		printf("Sending response back to %s – LIST\n", inet_ntoa(client_address.sin_addr));
 
 		send(client_socket, message, strlen(message), 0);
+	}
+}
+
+/**
+ * Removes file_name from the client_address.
+ * @param client_address sockaddr_in struct for client
+ * @param file_name      File name to remove
+ */
+void remove_file_from_source(struct sockaddr_in client_address, char *file_name) {
+	if (size(file_sources_list) != 0) {
+		file_source *source = find_occurrence(file_sources_list, &client_address, compare_source_addresses);
+
+		if (source) {
+			int remove_data(list* llist, const void* data, equal_op compare_func, list_op free_func);
+
+			int number_files_removed = remove_data(source->files, file_name, compare_file_names, free);
+
+			if (number_files_removed == 0) {
+				printf("No file found by that name to delete.\n");
+			} else {
+				printf("Removed %d files.\n", number_files_removed);
+			}
+		}
+	} else {
+		printf("No file sources to remove files from. Bailing out.\n");
 	}
 }
 

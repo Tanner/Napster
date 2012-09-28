@@ -104,7 +104,7 @@ char ** parse_message(char *message) {
 	// Otherwise, store the command and pick out arguments
 	result[0] = command;
 
-	if (strcmp(command, "ADD") == 0) {
+	if (strcmp(command, "ADD") == 0 || strcmp(command, "REMOVE") == 0) {
 		// Get the file name
 		char *file_name = calloc(1, sizeof(char *) * MAX_FILE_NAME_LENGTH);
 
