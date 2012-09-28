@@ -174,13 +174,13 @@ void remove_file_from_source(struct sockaddr_in client_address, char *file_name)
 			int number_files_removed = remove_data(source->files, file_name, compare_file_names, free);
 
 			if (number_files_removed == 0) {
-				printf("No file found by that name to delete.\n");
+				printf("\tNo file found by that name to delete.\n");
 			} else {
-				printf("Removed %d files.\n", number_files_removed);
+				printf("\tRemoved %d files.\n", number_files_removed);
 			}
 		}
 	} else {
-		printf("No file sources to remove files from. Bailing out.\n");
+		printf("\tNo file sources to remove files from. Bailing out.\n");
 	}
 }
 
@@ -197,18 +197,18 @@ void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 			char *file = find_occurrence(source->files, file_name, compare_file_names);
 
 			if (!file) {
-				printf("Adding file to existing source...\n");
+				printf("\tAdding file to existing source...\n");
 
 				push_front(source->files, file_name);
 			} else {
-				printf("File already exists in source; not adding again...\n");
+				printf("\tFile already exists in source; not adding again...\n");
 			}
 
 			return;
 		}
 	}
 
-	printf("Creating new source...\n");
+	printf("\tCreating new source...\n");
 
 	file_source *new_source = malloc(sizeof(file_source));
 	assert(new_source);
@@ -250,7 +250,7 @@ int compare_file_names(const void *a, const void *b) {
 void print_source(void *data) {
 	file_source *source = (file_source *) data;
 
-	printf("%s:\n", inet_ntoa(source->address.sin_addr));
+	printf("\t%s:\n", inet_ntoa(source->address.sin_addr));
 
 	traverse(source->files, print_files);
 }
@@ -260,5 +260,5 @@ void print_source(void *data) {
  * @param data File name
  */
 void print_files(void *data) {
-	printf("\t%s\n", (char *)data);
+	printf("\t\t%s\n", (char *)data);
 }
