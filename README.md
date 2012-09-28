@@ -25,11 +25,11 @@ The list message takes no arguments.
 ### Response
 The server responds with multiple commands depending on how many files are currently on the server.
 
-`LIST # # file file file\n`
+`LIST # file file file\n`
 
-The first number is the number of messages to expect. The second number is the current message number. The rest of the remaining arguments are the files available on the server.
+The number is the number of files to expect. The rest of the remaining arguments are the files available on the server.
 
-Multiple LIST responses may be sent depending on the number of files known by the server. If none are known, then the server replies with `LIST 1 1\n`.
+If none are known, then the server replies with `LIST 0\n`.
 
 Resources
 ---------
