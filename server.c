@@ -140,7 +140,11 @@ void list_all_files(int client_socket, struct sockaddr_in client_address) {
 		}
 
 		char *message;
-		asprintf(&message, "LIST %d%s\n", total_number_files, file_list);
+		if (asprintf(&message, "LIST %d%s\n", total_number_files, file_list) == -1) {
+			fprintf(stderr, "Could not create LIST command - too many files.\n");
+
+			return;
+		}
 
 		printf("Sending response back to %s – LIST\n", inet_ntoa(client_address.sin_addr));
 
