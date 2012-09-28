@@ -18,6 +18,7 @@
 #define PROMPT "(napster) "
 
 void add_file(int sock, char *string);
+void remove_file(int sock, char *string);
 void list_files(int sock, char *args);
 
 int arguments_exist(char *args);
@@ -73,6 +74,8 @@ int main(int argc, char *argv[]) {
 					break;
 				} else if (strcmp(command, "add") == 0) {
 					server_command(server_ip, server_port, check_file_name_length, add_file, args[1]);
+				} else if (strcmp(command, "remove") == 0) {
+					server_command(server_ip, server_port, check_file_name_length, remove_file, args[1]);
 				} else if (strcmp(command, "list") == 0) {
 					server_command(server_ip, server_port, NULL, list_files, NULL);
 				} else if (strcmp(command, "help") == 0) {
@@ -104,6 +107,19 @@ void add_file(int sock, char *string) {
 	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
 
 	snprintf(message, SEND_MESSAGE_SIZE, "ADD %s\n", string);
+
+	send(sock, message, strlen(message), 0);
+}
+
+/**
+ * Removes a file command.
+ * @param sock   Socket descriptor
+ * @param string File name to remove from server's list
+ */
+void remove_file(int sock, char *string) {
+	char *message = calloc(1, sizeof(char) * SEND_MESSAGE_SIZE);
+
+	snprintf(message, SEND_MESSAGE_SIZE, "REMOVE %s\n", string);
 
 	send(sock, message, strlen(message), 0);
 }
