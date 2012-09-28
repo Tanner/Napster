@@ -63,7 +63,8 @@ int main(int argc, char *argv[]) {
 				free(args);
 			}
 
-			args = split(input, " \n");
+			int number_args = 0;
+			args = split(input, " \n", &number_args);
 
 			char *command = args[0];
 

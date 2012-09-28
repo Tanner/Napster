@@ -15,6 +15,6 @@ char * get_response(int sock);
 int valid_message(char *message);
 char ** parse_message(char *message);
 
-char ** split(char *input, char *delimiter);
+char ** split(char *input, char *delimiter, int *size);
 
 #endif

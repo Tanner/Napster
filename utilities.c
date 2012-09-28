@@ -138,8 +138,9 @@ char ** parse_message(char *message) {
  *
  * @param *input		String to split up
  * @param *delimiter	Delimiter to use
+ * @param *size			Pointer that will contain the number of arguments found
  */
-char ** split(char *input, char *delimiter) {
+char ** split(char *input, char *delimiter, int *size) {
 	char *input_copy = 0;
 	char *temp = 0;
 
@@ -167,6 +168,8 @@ char ** split(char *input, char *delimiter) {
 
 	char **split = calloc(1, sizeof(char *) * count);
 	assert(split);
+
+	*size = count;
 
 	// Begin to assign the chunks into the array
 
