@@ -69,11 +69,11 @@ char ** parse_message(char *message, int *size) {
 	message[strlen(message) - 1] = '\0';
 
 	// Alloc result array – start at 1 for minimum of just command
-	char **result = calloc(1, sizeof(char *) * 1);
+	char **result = calloc(1, sizeof(char *));
 	assert(result);
 
 	// Get the command
-	char *command = calloc(1, sizeof(char *) * MAX_COMMAND_LENGTH);
+	char *command = calloc(MAX_COMMAND_LENGTH, sizeof(char));
 	assert(command);
 
 	int command_end_index = 0;
@@ -87,7 +87,8 @@ char ** parse_message(char *message, int *size) {
 			}
 
 			for (int j = 0; j < command_end_index; j++) {
-				memcpy(&command[j], &message[j], 1);
+//				memcpy(&command[j], &message[j], 1);
+                command[j] = message[j];
 			}
 
 			break;
@@ -102,18 +103,21 @@ char ** parse_message(char *message, int *size) {
 		return 0;
 	}
 
+    if (message[command_end_index] == ' ') {
+        command_end_index++;
+    }
+    
 	// Otherwise, store the command and pick out arguments
 	result[0] = command;
 	*size = 1;
-
 	if (strcmp(command, "ADD") == 0 || strcmp(command, "REMOVE") == 0) {
 		// Get the file name
-		char *file_name = calloc(1, sizeof(char) * MAX_FILE_NAME_LENGTH);
+		char *file_name = calloc(MAX_FILE_NAME_LENGTH, sizeof(char));
 
 		int file_name_length = 0;
 
 		for (int i = command_end_index; i < strlen(message) && i <= MAX_FILE_NAME_LENGTH + command_end_index; i++) {
-			memcpy(&file_name[i - command_end_index - 1], &message[i], 1);
+			file_name[i - command_end_index] = message[i];
 
 			file_name_length = i;
 		}
@@ -131,6 +135,7 @@ char ** parse_message(char *message, int *size) {
 		// If not matching command, return 0
 		free(command);
 		free(result);
+
 
 		return 0;
 	}
@@ -151,10 +156,10 @@ char ** split(char *input, char *delimiter, int *size) {
 
 	// Count the number of chunks that exist in the string
 
-	input_copy = calloc(1, sizeof(char) * strlen(input));
+	input_copy = calloc(strlen(input) + 1, sizeof(char));
 	assert(input_copy);
 
-	strcpy(input_copy, input);
+	strncpy(input_copy, input, strlen(input));
 
 	int count = -1;
 	do {
@@ -171,7 +176,7 @@ char ** split(char *input, char *delimiter, int *size) {
 
 	// Create an array of that size (to hold all the chunks)
 
-	char **split = calloc(1, sizeof(char *) * count);
+	char **split = calloc(count, sizeof(char *));
 	assert(split);
 
 	*size = count;

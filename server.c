@@ -191,6 +191,9 @@ void remove_file_from_source(struct sockaddr_in client_address, char *file_name)
  * @param file_name      File name to add
  */
 void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
+    char *dup_file_name = malloc(sizeof(char) * (strlen(file_name) + 1));
+    strncpy(dup_file_name, file_name, strlen(file_name) + 1);
+
 	if (size(file_sources_list) != 0) {
 		file_source *source = find_occurrence(file_sources_list, &client_address, compare_source_addresses);
 
@@ -200,7 +203,7 @@ void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 			if (!file) {
 				printf("\tAdding file to existing source...\n");
 
-				push_front(source->files, file_name);
+				push_front(source->files, dup_file_name);
 			} else {
 				printf("\tFile already exists in source; not adding again...\n");
 			}
@@ -217,7 +220,7 @@ void add_file_from_source(struct sockaddr_in client_address, char *file_name) {
 	new_source->address = client_address;
 	new_source->files = create_list();
 
-	push_front(new_source->files, file_name);
+	push_front(new_source->files, dup_file_name);
 	push_front(file_sources_list, new_source);
 }
 
