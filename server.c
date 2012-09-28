@@ -112,7 +112,18 @@ void list_all_files(int client_socket) {
 
 		send(client_socket, message, strlen(message), 0);
 	} else {
-		int number_file_sources = size(file_sources_list);
+		int number_file_sources = 0;
+		int total_number_files = 0;
+
+		number_file_sources = size(file_sources_list);
+		for (int i = 0; i < number_file_sources; i++) {
+			file_source *source = (file_source *) get_index(file_sources_list, i);
+
+			total_number_files += size(source->files);
+		}
+
+		char *file_list;
+
 		for (int i = 0; i < number_file_sources; i++) {
 			file_source *source = (file_source *) get_index(file_sources_list, i);
 
@@ -120,9 +131,18 @@ void list_all_files(int client_socket) {
 			for (int j = 0; j < number_files; j++) {
 				char *file_name = (char *) get_index(source->files, j);
 
-				printf("%s\n", file_name);
+				if (asprintf(&file_list, "%s %s", file_list, file_name) == -1) {
+					fprintf(stderr, "Could not create a list of files - too many files.\n");
+
+					return;
+				}
 			}
 		}
+
+		char *message;
+		asprintf(&message, "LIST %d%s\n", total_number_files, file_list);
+
+		printf("%s\n", message);
 	}
 }
 
