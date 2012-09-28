@@ -132,8 +132,12 @@ void list_files(int sock, char *args) {
 
 		printf("Server File List:\n");
 
-		for (int i = 2; i < number_response_args; i++) {
-			printf("%d) %s\n", i - 1, response_args[i]);
+		if (number_files == 0) {
+			printf("No files.\n");
+		} else {
+			for (int i = 2; i < number_response_args; i++) {
+				printf("%d) %s\n", i - 1, response_args[i]);
+			}
 		}
 	} else {
 		fprintf(stderr, "Unexpected response - expected LIST, but got %s.\n", response_args[0]);
