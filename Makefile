@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Werror -ansi -pedantic -std=c99
 
-RELEASE_FLAGS = -02
+RELEASE_FLAGS = -O2
 DEBUG_FLAGS = -g -DDEBUG
 
 CLIENT_OBJ = client.o utilities.o
