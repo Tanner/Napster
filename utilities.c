@@ -61,9 +61,10 @@ int valid_message(char *message) {
 /**
  * Parse a message into command and args.
  * @param  message String
+ * @param  size Pointer to a int that will contain the size of the array
  * @return Array of strings containing command and args
  */
-char ** parse_message(char *message) {
+char ** parse_message(char *message, int *size) {
 	// Trim '\n' from end of message
 	message[strlen(message) - 1] = '\0';
 
@@ -103,6 +104,7 @@ char ** parse_message(char *message) {
 
 	// Otherwise, store the command and pick out arguments
 	result[0] = command;
+	*size = 1;
 
 	if (strcmp(command, "ADD") == 0 || strcmp(command, "REMOVE") == 0) {
 		// Get the file name
@@ -120,6 +122,7 @@ char ** parse_message(char *message) {
 		file_name[file_name_length] = '\0';
 
 		result[1] = file_name;
+		*size += 1;
 	} else if (strcmp(command, "LIST") == 0) {
 		// Ignore any other arguments
 	} else {

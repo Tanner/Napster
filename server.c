@@ -78,7 +78,8 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 
 	printf("Got request from %s – ", inet_ntoa(client_address.sin_addr));
 
-	char **parse = parse_message(message);
+	int size = 0;
+	char **parse = parse_message(message, &size);
 
 	if (parse) {
 		printf("%s\n", parse[0]);
@@ -99,7 +100,7 @@ void handle_client(int client_socket, struct sockaddr_in client_address) {
 			list_all_files(client_socket, client_address);
 		}
 
-		for (int i = 0; i < sizeof(parse) / sizeof(char *); i++) {
+		for (int i = 0; i < size; i++) {
 			free(parse[i]);
 		}
 

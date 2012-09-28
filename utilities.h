@@ -13,7 +13,7 @@
 
 char * get_response(int sock);
 int valid_message(char *message);
-char ** parse_message(char *message);
+char ** parse_message(char *message, int *size);
 
 char ** split(char *input, char *delimiter, int *size);
 
